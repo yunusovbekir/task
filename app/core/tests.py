@@ -58,6 +58,7 @@ class CarListAPITestCases(BaseAPITestCase):
         super().setUp()
         self.cars_url = reverse_lazy('cars')
         self.popular_cars_url = reverse_lazy('popular-cars')
+        self.rate_url = reverse_lazy('rate')
 
     def test_cars_list(self):
         """ Test if cars API returns all 4 cars in the db """
@@ -98,3 +99,31 @@ class CarListAPITestCases(BaseAPITestCase):
         response = self.client.get(self.popular_cars_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+    def test_rate_car_invalid_rating(self):
+        car = Car.objects.first()
+        response = self.client.post(
+            self.rate_url, {"car_id": car.id, "rating": 6}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('rating')[0], 'Rating must be between 1 and 5'
+        )
+
+    def test_rate_car_invalid_car_id(self):
+        response = self.client.post(
+            self.rate_url, {"car_id": 9595, "rating": 3}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('car_id')[0], 'No car found with given ID'
+        )
+
+    def test_rate_car_successful(self):
+        car = Car.objects.first()
+        response = self.client.post(
+            self.rate_url, {"car_id": car.id, "rating": 5}
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data.get('car_id'), car.id)
+        self.assertEqual(response.data.get('rating'), 5)
