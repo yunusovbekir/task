@@ -35,6 +35,8 @@ class CreateReviewSerializer(serializers.Serializer):
     rating = serializers.IntegerField()
 
     def validate(self, attrs):
+        """ Validate give car ID and rating. """
+
         rating = attrs.get('rating')
         car_id = attrs.get('car_id')
 

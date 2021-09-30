@@ -100,6 +100,23 @@ class CarListAPITestCases(BaseAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
+    def test_delete_car_invalid_id(self):
+        delete_url = reverse_lazy('delete', kwargs={"id": 9999})
+        response = self.client.delete(delete_url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.data.get('error'), 'No car found with given ID'
+        )
+
+    def test_delete_car_successful(self):
+        car = Car.objects.first()
+        delete_url = reverse_lazy('delete', kwargs={'id': car.id})
+        response = self.client.delete(delete_url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Car.objects.filter(id=car.id).exists())
+
     def test_rate_car_invalid_rating(self):
         car = Car.objects.first()
         response = self.client.post(
