@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import *
+from .models import Model, Make, Review, Car
 
 
 class CarAdmin(admin.ModelAdmin):

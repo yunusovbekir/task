@@ -1,5 +1,8 @@
+from functools import cached_property
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .managers import CustomManager
 
 
 class Make(models.Model):
@@ -61,13 +64,10 @@ class Review(models.Model):
         _('review add datetime'),
         auto_now_add=True,
     )
+    objects = CustomManager()
 
     def __str__(self):
         return f"Review for {self.car}"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        getattr(self.car, 'update_rating')()
 
     class Meta:
         verbose_name = _('Review')
@@ -102,6 +102,10 @@ class Car(models.Model):
         verbose_name = _("Car")
         verbose_name_plural = _("Cars")
 
+    def update_rating(self):
+        self.avg_rating = self.calculate_avg_rating()
+        self.save()
+
     def calculate_avg_rating(self):
         """ Calculate average rating """
         result = self.reviews.all().aggregate(
@@ -115,6 +119,6 @@ class Car(models.Model):
             rating = float(reviews_sum) / reviews_count
         return rating
 
-    def update_rating(self):
-        self.avg_rating = self.calculate_avg_rating()
-        self.save()
+    @cached_property
+    def rates_number(self):
+        return self.reviews.count()
