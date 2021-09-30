@@ -1,0 +1,7 @@
+.venv/
+bin/docker/postgredb/
+.env
+.idea/
+__pycache__/
+db.sqlite3
+media/

@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    restart: "always"
+    ports:
+      - "8000:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ../nginx/conf.d/nginx.conf:/etc/nginx/nginx.conf
+      - ../../app/static:/app/static
+
+  postgres:
+    container_name:  postgres-db
+    image:           postgres:10.10
+    ports:
+      - "5432:5432" # Bind host port 5432 to PostgreSQL port 5432
+    volumes:
+      - ./postgredb:/var/lib/postgresql/data
+    env_file: ../../.env
+
+  web:
+    container_name: app
+    build: ../..
+    restart: "always"
+    env_file: ../../.env
+    environment:
+      - VIRTUAL_HOST=
+      - VIRTUAL_PORT=8000
+      - HTTP_PORT=8000
+      - STATS_PORT=8001
+    volumes:
+      - ../../app:/code
+    ports:
+      - "8015:8000"
+    links:
+      - postgres
+    depends_on:
+      - "postgres"
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
