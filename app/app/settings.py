@@ -3,13 +3,8 @@ from os import getenv, path
 import django_heroku
 
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # -----------------------------------------------------------------------------
 
@@ -67,6 +62,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+# -----------------------------------------------------------------------------
+
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
 
 # -----------------------------------------------------------------------------
 
@@ -168,7 +169,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 if not DEBUG:
-    STATIC_ROOT = path.join(BASE_DIR, "static")
+    STATIC_ROOT = path.join(BASE_DIR, "staticfiles")
 else:
     STATICFILES_DIRS = [
         path.join(BASE_DIR, "static")
