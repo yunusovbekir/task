@@ -1,5 +1,7 @@
 from pathlib import Path
 from os import getenv, path
+
+import dj_database_url
 import django_heroku
 
 
@@ -118,6 +120,10 @@ DATABASES = {
         'PORT': getenv('POSTGRES_PORT', 5432),
     }
 }
+
+if getenv('HEROKU_POSTGRESQL_BLUE_URL'):
+    db_from_env = dj_database_url.config(conn_max_age=600)
+    DATABASES['default'].update(db_from_env)
 
 
 # -----------------------------------------------------------------------------
