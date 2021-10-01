@@ -100,7 +100,38 @@ class CarListAPITestCases(BaseAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
+    def test_create_car_invalid_make(self):
+        data = {"make": "Testmake", "model": "Model 3"}
+        response = self.client.post(self.cars_url, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('make')[0], 'No car found with given data'
+        )
+
+    def test_create_car_invalid_model(self):
+        data = {"make": "Tesla", "model": "Model 33333"}
+        response = self.client.post(self.cars_url, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('model')[0], 'No car found with given data'
+        )
+
+    def test_create_car_already_exists(self):
+        data = {"make": "BMW", "model": "M3"}
+        response = self.client.post(self.cars_url, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, data)
+
+    def test_create_car_successful(self):
+        data = {"make": "Tesla", "model": "Model S"}
+        response = self.client.post(self.cars_url, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, data)
+
     def test_delete_car_invalid_id(self):
+        """
+            Test endpoint with non-existing car id.
+        """
         delete_url = reverse_lazy('delete', kwargs={"id": 9999})
         response = self.client.delete(delete_url)
 
@@ -127,7 +158,24 @@ class CarListAPITestCases(BaseAPITestCase):
             response.data.get('rating')[0], 'Rating must be between 1 and 5'
         )
 
+    def test_rate_car_invalid_rating_invalid_input_type(self):
+        """
+            If rating is not an integer,
+            endpoint should return user-friendly error message.
+        """
+        car = Car.objects.first()
+        response = self.client.post(
+            self.rate_url, {"car_id": car.id, "rating": "test"}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('rating')[0], 'A valid integer is required.'
+        )
+
     def test_rate_car_invalid_car_id(self):
+        """
+            Test endpoint with non-existing car id.
+        """
         response = self.client.post(
             self.rate_url, {"car_id": 9595, "rating": 3}
         )
@@ -136,7 +184,23 @@ class CarListAPITestCases(BaseAPITestCase):
             response.data.get('car_id')[0], 'No car found with given ID'
         )
 
+    def test_rate_car_invalid_car_id_invalid_input_type(self):
+        """
+            If car_id is not an integer,
+            endpoint should return user-friendly error message.
+        """
+        response = self.client.post(
+            self.rate_url, {"car_id": "hello world", "rating": 3}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data.get('car_id')[0], 'A valid integer is required.'
+        )
+
     def test_rate_car_successful(self):
+        """
+            Test endpoint with invalid rating score.
+        """
         car = Car.objects.first()
         response = self.client.post(
             self.rate_url, {"car_id": car.id, "rating": 5}

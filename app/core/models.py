@@ -33,7 +33,7 @@ class Model(models.Model):
     )
 
     def __str__(self):
-        return f'{self.make.title} - {self.title}'
+        return self.title
 
     class Meta:
         verbose_name = _("Model")

@@ -1,13 +1,13 @@
 from django.urls import path
 from .views import (
-    CarsListAPIView,
+    CarsAPIView,
     PopularCarsListAPIView,
-    CreateReviewAPIView,
     DeleteCarAPIView,
+    CreateReviewAPIView,
 )
 
 urlpatterns = [
-    path('cars/', CarsListAPIView.as_view(), name='cars'),
+    path('cars/', CarsAPIView.as_view(), name='cars'),
     path('popular/', PopularCarsListAPIView.as_view(), name='popular-cars'),
     path('delete/<int:id>/', DeleteCarAPIView.as_view(), name='delete'),
     path('rate/', CreateReviewAPIView.as_view(), name='rate'),

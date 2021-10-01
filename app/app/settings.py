@@ -28,6 +28,12 @@ ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', '*').split(",")
 # -----------------------------------------------------------------------------
 
 
+VEHICLE_API = 'https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/'
+
+
+# -----------------------------------------------------------------------------
+
+
 # Application definition
 
 INSTALLED_APPS = [

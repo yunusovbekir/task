@@ -8,13 +8,22 @@ from .serializers import (
     CarSerializer,
     PopularCarSerializer,
     CreateReviewSerializer,
+    CreateCarSerializer,
 )
 
 
-class CarsListAPIView(ListAPIView):
-    """ API endpoint to list all cars. """
+class CarsAPIView(ListAPIView):
+    """ API endpoint to list all cars and create a new car """
+
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+    post_serializer_class = CreateCarSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.post_serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
 
 
 class PopularCarsListAPIView(ListAPIView):
