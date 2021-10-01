@@ -11,3 +11,20 @@ services:
     volumes:
       - ./postgredb:/var/lib/postgresql/data
     env_file: ../../.env.dev
+
+  web:
+    container_name: app
+    build: ../..
+    restart: "always"
+    env_file: ../../.env.dev
+    volumes:
+      - ../..:/code
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn app.wsgi:application --bind 0.0.0.0:8000 --reload"
+    ports:
+      - "8000:8000"
+    links:
+      - postgres
+    depends_on:
+      - "postgres"
